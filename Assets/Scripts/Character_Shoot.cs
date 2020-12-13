@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Character_Shoot : MonoBehaviour
 {
+    public float damage = 10f;
+    public float range = 100f;
+
     // Start is called before the first frame update
     void Start()
     {

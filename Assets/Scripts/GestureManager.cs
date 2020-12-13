@@ -7,9 +7,18 @@ public class GestureManager : MonoBehaviour
 {
     public static GestureManager Instance;
 
-    public event EventHandler<MyTapEventArgs> OnTap;
-
+    //Tap
     public TapProperty _tapProperty;
+    public event EventHandler<TapEventArgs> OnTap;
+
+    //Swipe
+    public SwipeProperty _swipeProperty;
+    public event EventHandler<SwipeEventArgs> OnSwipe;
+
+    //Drag
+    public DragProperty _dragProperty;
+    public event EventHandler<DragEventArgs> OnDrag;
+    public GameObject CrossHair = null;
 
     //Point where gesture started
     private Vector2 startPoint = Vector2.zero;
@@ -17,6 +26,8 @@ public class GestureManager : MonoBehaviour
     private Vector2 endPoint = Vector2.zero;
     //Time from Began to Ended
     private float gestureTime = 0;
+
+    Touch trackedFinger1;
 
     private void Awake()
     {
@@ -29,8 +40,6 @@ public class GestureManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
-    Touch trackedFinger1;
 
     private void Update()
     {
@@ -48,39 +57,175 @@ public class GestureManager : MonoBehaviour
             {
                 endPoint = trackedFinger1.position;
 
+                
                 //If total gesture time is below max AND if covered screen distance is below max
                 if(gestureTime <= _tapProperty.tapTime && Vector2.Distance(startPoint, endPoint) < (Screen.dpi * _tapProperty.tapMaxDistance))
                 {
-                    FireTapEvent(startPoint);
+                    FireTapEvent();
+                }
+                
+
+                //If gesture is below the max time AND if finger moved more than the minimum required
+                if(gestureTime <= _swipeProperty.SwipeTime && (Vector2.Distance(startPoint, endPoint) >= (_swipeProperty.minSwipeDistance * Screen.dpi)))
+                {
+                    FireSwipeEvent();
                 }
             }
             else
             {
                 gestureTime += Time.deltaTime;
+
+                //If finger has stayed long enough on screen, consider it a drag
+                if(gestureTime >= _dragProperty.DragBufferTime)
+                {
+                    FireDragEvents();
+                }
             }
         }
     }
 
-    private void FireTapEvent(Vector2 pos)
+    private void FireTapEvent()
     {
-        Debug.Log("TAP!");
-        if(OnTap != null)
+
+        Ray r = Camera.main.ScreenPointToRay(startPoint);
+        RaycastHit h = new RaycastHit();
+        GameObject hitObj = null;
+
+        if(Physics.Raycast(r, out h, Mathf.Infinity))
         {
-            Ray r = Camera.main.ScreenPointToRay(pos);
-            RaycastHit h = new RaycastHit();
-            GameObject hitObj = null;
-
-            if(Physics.Raycast(r, out h, Mathf.Infinity))
-            {
-                hitObj = h.collider.gameObject;
-            }
-
-            //Create the event args first
-            MyTapEventArgs tapArgs = new MyTapEventArgs(pos, hitObj);
-
-            //On Tap with THIS as the sender + tapArgs
-            OnTap(this, tapArgs);
+            hitObj = h.collider.gameObject;
         }
+
+        //Create the event args first
+        TapEventArgs args = new TapEventArgs(startPoint, hitObj);
+
+        if (OnTap != null)
+        {
+            //On Tap with THIS as the sender + tapArgs
+            OnTap(this, args);
+        }
+
+        if(hitObj != null)
+        {
+            ITapped tap = hitObj.GetComponent<ITapped>();
+            if(tap != null)
+            {
+                tap.OnTap(args);
+            }
+        }
+    }
+
+    private void FireSwipeEvent()
+    {
+        Vector2 diff = endPoint - startPoint;
+
+        SwipeDirections swipeDir;
+
+        Ray r = Camera.main.ScreenPointToRay(startPoint);
+        RaycastHit hit = new RaycastHit();
+        GameObject hitObj = null;
+
+        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        {
+            hitObj = hit.collider.gameObject;
+        }
+
+        //Check which axis changed the most x or y
+        if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y))
+        {
+            //If x is > 0 right, otherwise left
+            if (diff.x > 0)
+            {
+                Debug.Log("SWIPE RIGHT");
+                swipeDir = SwipeDirections.RIGHT;
+            }
+            else
+            {
+                Debug.Log("SWIPE LEFT");
+                swipeDir = SwipeDirections.LEFT;
+            }
+        }
+        else
+        {
+            //If y is > 0 up, otherwise down
+            if (diff.y > 0)
+            {
+                Debug.Log("SWIPE UP");
+                swipeDir = SwipeDirections.UP;
+            }
+            else
+            {
+                Debug.Log("SWIPE DOWN");
+                swipeDir = SwipeDirections.DOWN;
+            }
+        }
+
+        if(OnSwipe != null)
+        {
+            SwipeEventArgs args = new SwipeEventArgs(startPoint, diff, swipeDir, hitObj);
+
+            OnSwipe(this, args);
+        }
+
+        if(hitObj != null)
+        {
+            ISwipped swipe = hitObj.GetComponent<ISwipped>();
+            if(swipe != null)
+            {
+                swipe.OnSwipe(new SwipeEventArgs(startPoint, diff, swipeDir,hitObj));
+            }
+        }
+    }
+
+    private void FireDragEvents()
+    {
+        //Debug.Log($"Dragging {trackedFinger1.position.ToString()}");
+        IDragged drag;
+
+        Ray r = Camera.main.ScreenPointToRay(startPoint);
+        RaycastHit hit = new RaycastHit();
+        GameObject hitObj = null;
+
+        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        {
+            hitObj = hit.collider.gameObject;
+        }
+
+        DragEventArgs args = new DragEventArgs(trackedFinger1, startPoint, endPoint, hitObj);
+
+        if(OnDrag != null)
+        {
+            OnDrag(this, args);
+        }
+
+        if(hitObj != null)
+        {
+            drag = hitObj.GetComponent<IDragged>();
+            if(drag != null)
+            {
+                drag.OnDrag(args);
+            }
+            
+            else
+            {
+                drag = CrossHair.GetComponent<IDragged>(); //Camera.main.GetComponent<IDragged>();
+                if (drag != null)
+                {
+                    drag.OnDrag(args);
+                }
+            }
+            
+        }
+        
+        else
+        {
+            drag = CrossHair.GetComponent<IDragged>();//Camera.main.GetComponent<IDragged>();
+            if (drag != null)
+            {
+                drag.OnDrag(args);
+            }
+        }
+        
     }
 
     private void OnDrawGizmos()

@@ -18,7 +18,7 @@ public class TapReceiver : MonoBehaviour
         GestureManager.Instance.OnTap -= OnTap;
     }
 
-    private void OnTap(object sender, MyTapEventArgs e)
+    private void OnTap(object sender, TapEventArgs e)
     {
         if(e.HitObject == null)
         {

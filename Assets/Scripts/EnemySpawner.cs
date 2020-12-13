@@ -22,12 +22,12 @@ public class EnemySpawner : MonoBehaviour
 
     void Enable()
     {
-        EnemyController.OnEnemyKilled += SpawnEnemy;
+        EnemyManager.OnEnemyKilled += SpawnEnemy;
     }
 
     void SpawnEnemy()
     {
         int randomPoint = Mathf.RoundToInt(Random.Range(0f, EnemySpawnPoint.Length - 1));
-        Instantiate(EnemyPrefab, EnemySpawnPoint[randomPoint].transform.position, Quaternion.identity);
+        Instantiate(EnemyPrefab, EnemySpawnPoint[randomPoint].transform.position, EnemySpawnPoint[randomPoint].transform.rotation);
     }
 }

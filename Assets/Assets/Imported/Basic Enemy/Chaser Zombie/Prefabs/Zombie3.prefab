@@ -820,7 +820,13 @@ Animator:
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'Base HumanPelvis'\n\tTransform 'Base HumanLArmForearm'\n\tTransform
+    'Base HumanLArmDigit52'\n\tTransform 'Base HumanLArmDigit31'\n\tTransform 'Base
+    HumanRArmCollarbone'\n\tTransform 'Base HumanSpine1'\n\tTransform 'Base HumanLArmDigit21'\n\tTransform
+    'Base HumanLArmUpperarm'\n\tTransform 'Base HumanLLegCalf'\n\tTransform 'Base
+    HumanPelvis'\n\tand more ...\n\tFrom animation clip 'mixamo.com (1)'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
@@ -869,6 +875,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
