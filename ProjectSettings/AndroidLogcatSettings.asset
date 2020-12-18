@@ -1,10 +1,10 @@
 {
-    "m_SelectedDeviceId": "127.0.0.1:5555",
+    "m_SelectedDeviceId": "ce0517155801a30401",
     "m_SelectedPackage": {
-        "deviceId": "127.0.0.1:5555",
-        "name": "com.ParangNormal.Intothedarkness",
-        "processId": 7758,
-        "exited": true
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
+        "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
@@ -12,6 +12,30 @@
             "deviceId": "ce0517155801a30401",
             "name": "com.ParangNormal.Intothedarkness",
             "processId": 20553,
+            "exited": true
+        },
+        {
+            "deviceId": "ce0517155801a30401",
+            "name": "com.sec.android.app.launcher",
+            "processId": 19128,
+            "exited": false
+        },
+        {
+            "deviceId": "ce0517155801a30401",
+            "name": "com.unity3d.mobileremote",
+            "processId": 26682,
+            "exited": true
+        },
+        {
+            "deviceId": "ce0517155801a30401",
+            "name": "com.sec.android.app.myfiles",
+            "processId": 30355,
+            "exited": true
+        },
+        {
+            "deviceId": "ce0517155801a30401",
+            "name": "com.android.settings",
+            "processId": 23327,
             "exited": false
         },
         {
